@@ -17,14 +17,12 @@ def index():
 
 @app.route('/post', methods=['POST'])
 def save_post():
-    if not col.find({}):
-        idx = 0
-        print(request.form)
-    idx = len(col.find({}))
+    idx = len(list(col.find({})))
+    title = request.form.get('title')
     content = request.form.get('content')
     reg_date = datetime.datetime.now()
-    doc = {"idx": idx, 'content': content, 'reg_date': reg_date}
-    col.insert_one(doc)
+    doc = {"idx": idx, 'title': title, 'content': content, 'reg_date': reg_date}
+    col.insert(doc)
     return jsonify({"result": "success", "uploaded": idx})
 
 
@@ -38,7 +36,7 @@ def get_post():
 
 @app.route('/post', methods=['GET'])
 def delete_post():
-    contents = col.find({}, {"_id": False}).sort({"reg_date": -1})
+    contents = list(col.find({}, {"_id": False}).sort("reg_date", -1))
     print(contents)
     return jsonify({"result": "success", "contents": contents})
 
