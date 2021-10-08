@@ -105,8 +105,17 @@
         }
 
         function makeListPost(post, index) {
-            let {idx, title, content, reg_date} = post;
-            $("#list-post").append(`<tr><td>#${index}</td><td>${title}</td><td>${content}</td><td>${reg_date}</td><td><button onclick="deleteArticle('${idx}')">삭제</button></td></tr>`)
+            let {idx, title, content, reg_date, mod_date, read} = post;
+            $("#list-post").append(`
+            <tr><td>#${index}</td>
+            <td>${title && title}</td>
+            <td>${content && content}</td>
+            <td>${reg_date && reg_date}</td>
+            <td>${mod_date && mod_date}</td>
+            <td>${read && read}</td>
+            <td><button onclick="readArticle('${idx}')">열기</button></td>
+            <td><button onclick="deleteArticle('${idx}')">삭제</button></td>
+            </tr>`)
         }
 
         function deleteArticle(idx) {
@@ -116,6 +125,32 @@
                 url: `/post?idx=${idx}`,
                 success: function (res) {
                     window.alert(res['result'])
+                    window.location.reload();
+                }
+            })
+        }
+
+        function readArticle(idx) {
+            $.ajax({
+                type: "GET",
+                data: {},
+                url: `/detail/${idx}`,
+                success: function (res) {
+                    window.alert(res['result'])
+                    // modal
+                    window.location.reload();
+                }
+            })
+        }
+
+        function updateArticle(idx) {
+            $.ajax({
+                type: "PUT",
+                data: {},
+                url: `/update/${idx}`,
+                success: function (res) {
+                    window.alert(res['result'])
+                    // modal
                     window.location.reload();
                 }
             })
@@ -153,8 +188,11 @@
         <tr>
             <th scope="col">#</th>
             <th scope="col">타이틀</th>
-            <th scope="col">날짜</th>
             <th scope="col">내용</th>
+            <th scope="col">작성일</th>
+            <th scope="col">수정일</th>
+            <th scope="col">조회</th>
+            <th scope="col">열기</th>
             <th scope="col">삭제</th>
         </tr>
         </thead>
