@@ -45,6 +45,7 @@ def delete_post():
 
 @app.route('/detail/<idx>', methods=['GET'])
 def read_post(idx):
+    idx = int(idx)
     col.update_one({"idx": idx}, {"$inc": {"read": +1}})
     content = list(col.find({"idx": idx}, {"_id": False}))
     print(content)
@@ -53,6 +54,7 @@ def read_post(idx):
 
 @app.route('/update/<idx>', methods=['PUT'])
 def modify_post(idx):
+    idx = int(idx)
     title = request.form.get('title')
     content = request.form.get('content')
     mod_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")

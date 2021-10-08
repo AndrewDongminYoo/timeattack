@@ -113,7 +113,7 @@
             <td>${reg_date && reg_date}</td>
             <td>${mod_date && mod_date}</td>
             <td>${read && read}</td>
-            <td><button class="btn" data-toggle="modal" data-target="#exampleModal">열기</button></td>
+            <td><button class="btn" onclick="readArticle('${idx}')">열기</button></td>
             <td><button class="btn" onclick="deleteArticle('${idx}')">삭제</button></td>
             </tr>`)
         }
@@ -136,25 +136,28 @@
                 data: {},
                 url: `/detail/${idx}`,
                 success: function (res) {
-                    window.alert(res['result'])
-                    $("#exampleModal").html = `        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    ${res['content'].content}
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" onclick="updateArticle()">Save changes</button>
-                </div>
-            </div>
-        </div>`
-                    window.location.reload();
+                    // window.alert(res['result'])
+                    $("#exampleModal").html(`
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                ${res['content'].content}
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary">Close</button>
+                                <button type="button" class="btn btn-primary" onclick="updateArticle('${idx}')">Save changes</button>
+                            </div>
+                        </div>
+                    </div>`)
+                    $("#exampleModal").show();
+                    $("#exampleModal").removeClass('fade');
+                    // window.location.reload();
                 }
             })
         }
