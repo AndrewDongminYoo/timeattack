@@ -96,9 +96,9 @@
                 contentType: 'application/json',
                 success: function (res) {
                     if (!res['contents']) return;
-                    for (let i=0;i<res['contents'].length;i++) {
+                    for (let i = 0; i < res['contents'].length; i++) {
                         let post = res['contents'][i]
-                        makeListPost(post, i+1)
+                        makeListPost(post, i + 1)
                     }
                 }
             })
@@ -113,8 +113,8 @@
             <td>${reg_date && reg_date}</td>
             <td>${mod_date && mod_date}</td>
             <td>${read && read}</td>
-            <td><button onclick="readArticle('${idx}')">열기</button></td>
-            <td><button onclick="deleteArticle('${idx}')">삭제</button></td>
+            <td><button class="btn" data-toggle="modal" data-target="#exampleModal">열기</button></td>
+            <td><button class="btn" onclick="deleteArticle('${idx}')">삭제</button></td>
             </tr>`)
         }
 
@@ -137,7 +137,23 @@
                 url: `/detail/${idx}`,
                 success: function (res) {
                     window.alert(res['result'])
-                    // modal
+                    $("#exampleModal").html = `        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    ${res['content'].content}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="updateArticle()">Save changes</button>
+                </div>
+            </div>
+        </div>`
                     window.location.reload();
                 }
             })
@@ -187,7 +203,7 @@
         <thead>
         <tr>
             <th scope="col">#</th>
-            <th scope="col">타이틀</th>
+            <th scope="col">제목</th>
             <th scope="col">내용</th>
             <th scope="col">작성일</th>
             <th scope="col">수정일</th>
@@ -197,9 +213,11 @@
         </tr>
         </thead>
         <tbody id="list-post">
-
         </tbody>
     </table>
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+         aria-hidden="true">
+    </div>
 </div>
 </body>
 
