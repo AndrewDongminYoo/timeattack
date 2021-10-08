@@ -1,0 +1,54 @@
+﻿기능,Method,URL,requirement,request,response,pymongo
+사용자가 글 작성,POST,/posts,"content, title","body: {
+    title: [제목],
+    content: [내용]
+}","body: {
+    id: [ID],
+    title: [제목],
+    content: [내용],
+    read: [조회수],
+    reg_date: [작성일],
+    mod_date: [수정일=작성일]
+}","db.stock.insert_one({
+     id: db.stock.count({})+1,
+    title: title,
+    content: content,
+    read: 0,
+    reg_date: datetime.now(),
+    mod_date: datetime.now()
+})
+
+return id"
+사용자가 사이트에 접속함,GET,/posts,,-,list<Post[]>,"return db.stock.find({}, {""_id"": False}).sort('reg_date', -1)"
+사용자가 특정 게시글을 읽으려 함,GET,/post/<id>,"content, id, mod_date, read, reg_date, title",-,"body: {
+    id: [ID],
+    title: [제목],
+    content: [내용],
+    read: [조회수],
+    reg_date: [작성일],
+    mod_date: [수정일]
+}","db.stock.update({""id"":id}, {""$inc"": {""read"": +1}})
+
+return list(db.stock.find({""id"": id}, {""_id"": False}))[0]
+"
+사용자가 특정 게시글을 수정하고자 함,PUT,/post/<id>,"content, id, title","body: {
+    title: [제목],
+    content: [내용]
+}","body: {
+    id: [ID],
+    title: [제목],
+    content: [내용],
+    read: [조회수],
+    reg_date: [작성일],
+    mod_date: [수정일-갱신]
+}","db.stock.update({""id"":id}, {""$set"":{
+    ""title: title,
+    ""content"": content,
+    ""mod_date"": datetime.now()
+}})
+
+return id"
+사용자가 특정 게시글을 삭제하고자 함,DELETE,/post/<id>,id,,,"db.stock.delete_one({""id"": id})
+
+return id"
+,,,,,,
