@@ -2,63 +2,69 @@ import datetime
 
 from flask import Flask, render_template, jsonify, request
 from pymongo import MongoClient
+import os
 
+idx = 0
 app = Flask(__name__)
-
+os.popen('mongod')
 client = MongoClient("mongodb://localhost:27017/")
 db = client.dbStock
 col = db.contents
 
 
 @app.route('/')
-def index():
+def hello_main():
     return render_template('index.html')
 
 
-@app.route('/post', methods=['POST'])
+@app.route('/posts', methods=['POST'])
 def save_post():
-    idx = col.count({})+1
+    last = list(col.find({}, {"_id": False}).sort("idx", -1))
+    global idx
+    if not last:
+        idx += 1
+    else:
+        idx = last[0]["idx"]+1
     title = request.form.get('title')
     content = request.form.get('content')
     reg_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     mod_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     read = 0
     doc = {"idx": idx, 'title': title, 'content': content, 'reg_date': reg_date, "mod_date": mod_date, 'read': read}
-    col.insert(doc)
+    col.insert_one(doc)
     return jsonify({"result": "success", "uploaded": idx})
 
 
-@app.route('/post', methods=['DELETE'])
+@app.route('/posts', methods=['GET'])
 def get_post():
-    idx = request.args.get('idx')
-    print(idx)
-    col.delete_one({"idx": idx})
-    return jsonify({"result": "success", "deleted": idx})
-
-
-@app.route('/post', methods=['GET'])
-def delete_post():
     contents = list(col.find({}, {"_id": False}).sort("reg_date", -1))
     print(contents)
     return jsonify({"result": "success", "contents": contents})
 
 
-@app.route('/detail/<idx>', methods=['GET'])
-def read_post(idx):
-    idx = int(idx)
-    col.update_one({"idx": idx}, {"$inc": {"read": +1}})
-    content = list(col.find({"idx": idx}, {"_id": False}))
+@app.route('/post/<i>', methods=['GET'])
+def read_post(i):
+    i = int(i)
+    col.update_one({"idx": i}, {"$inc": {"read": +1}})
+    content = list(col.find({"idx": i}, {"_id": False}))[0]
     print(content)
-    return jsonify({"result": "success", "updated": content})
+    return jsonify({"result": "success", "post": content})
 
 
-@app.route('/update/<idx>', methods=['PUT'])
-def modify_post(idx):
-    idx = int(idx)
+@app.route('/post/<i>', methods=['DELETE'])
+def delete_post(i):
+    i = int(i)
+    col.delete_one({"idx": i})
+    return jsonify({"result": "success", "deleted": i})
+
+
+@app.route('/post/<i>', methods=['PUT'])
+def modify_post(i):
+    i = int(i)
     title = request.form.get('title')
     content = request.form.get('content')
     mod_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    col.update_one({"idx": idx}, {"$set": {"title": title, "content": content, "mod_date": mod_date}})
+    col.update_one({"idx": i}, {"$set": {"title": title, "content": content, "mod_date": mod_date}})
     return jsonify({"result": "success", "updated": content})
 
 
