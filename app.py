@@ -37,7 +37,8 @@ def save_post():
 
 @app.route('/posts', methods=['GET'])
 def get_post():
-    contents = list(col.find({}, {"_id": False}).sort("reg_date", -1))
+    sort = request.args.get("sort")
+    contents = list(col.find({}, {"_id": False}).sort(sort, -1))
     print(contents)
     return jsonify({"result": "success", "contents": contents})
 
